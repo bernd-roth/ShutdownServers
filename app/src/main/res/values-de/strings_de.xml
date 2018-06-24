@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">ShutdownServers</string>
+    <string name="title_activity_settings">Einstellungen</string>
+    <string name="STOP">STOPP</string>
+    <string name="MainMenu">Hauptmenue</string>
+    <string name="ShutdownServers">ShutdownServers</string>
+    <string name="ShutdownAllServer">Alle Server ausschalten</string>
+    <string name="SearchingForIpAddresses">Suche nach Server</string>
+    <string name="ServersAvailable">Die folgenden Server sind vorhanden</string>
+    <string name="SSHKeyfilePassword">SSH Keyfile Passwort</string>
+    <string name="SSHKeyfile">SSH Keyfile</string>
+    <string name="Save">Speichern</string>
+    <string name="Search">Suche</string>
+    <string name="username">Benutzername</string>
+    <string name="password">Kennwort</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="startshutdown">Beginne mit dem Herunterfahren</string>
+    <string name="progressDialogTitle">Starte herunterfahren</string>
+    <string name="progressDialogMessage">Laufender Prozess wird beendet, bitte warten...</string>
+    <string name="editingAlertBuilder">Ersetze IP Adresse durch Hostnamen</string>
+    <string name="ok">Ok</string>
+    <string name="use_hostname">Hostname zum Abschalten benutzen</string>
+    <string name="use_ip">Ip Adresse zum Abschalten benutzen</string>
+    <string name="no_given_name_yet">Kein Name</string>
+    <string name="add">Hinzufügen</string>
+    <string name="addItemToDatabase">Füge Server zu existierender Liste hinzu</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="No_server_name_yet">Kein Hostname derzeit verfügbar</string>
+</resources>
