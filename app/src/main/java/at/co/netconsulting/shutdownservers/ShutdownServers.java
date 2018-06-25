@@ -194,7 +194,6 @@ public class ShutdownServers extends AppCompatActivity {
     }
 
     public void executeRemoteCommand(Context context, String hostname, String ip) throws Exception {
-        boolean isConnected = true;
         String command = "sudo shutdown -h now";
         model = new SharedPreferenceModel(this);
         String radioButtonHostnameOrIp = model.getStringSharedPreference(SharedPreferencesStaticVariables.SHUTDOWN_USING_HOSTNAME_OR_IP);
@@ -231,8 +230,7 @@ public class ShutdownServers extends AppCompatActivity {
             channel.disconnect();
             session.disconnect();
         } catch (JSchException JSchEx) {
-            MyException except = new MyException("No connection possible. Error message is: " + JSchEx.getMessage());
-            except.alertUser(getApplicationContext());
+            JSchEx.getMessage();
         }
     }
 

@@ -249,12 +249,11 @@ public class Settings extends AppCompatActivity {
 
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-        alert.setTitle("Test");
-        alert.setMessage("Test");
+        alert.setTitle(getResources().getString(R.string.editingAlertBuilder));
 
         // Set an EditText view to get user input
         final EditText editTextHostname = new EditText(this);
-            editTextHostname.setHint("Hostname");
+            editTextHostname.setHint("Host / Servername");
         final EditText editTextIpAddress = new EditText(this);
             editTextIpAddress.setHint("192.168.1.1");
 

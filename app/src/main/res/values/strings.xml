@@ -17,7 +17,7 @@
     <string name="startshutdown">Start Shutdown</string>
     <string name="progressDialogTitle">Starting shutdown</string>
     <string name="progressDialogMessage">Running process will be stopped, please wait...</string>
-    <string name="editingAlertBuilder">Changing IP Address to name</string>
+    <string name="editingAlertBuilder">Editing Server / Hostname and IP - address</string>
     <string name="ok">Ok</string>
     <string name="use_hostname">Use hostname for shutdown</string>
     <string name="use_ip">Use ip for shutdown</string>

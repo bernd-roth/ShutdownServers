@@ -17,7 +17,7 @@
     <string name="startshutdown">Beginne mit dem Herunterfahren</string>
     <string name="progressDialogTitle">Starte herunterfahren</string>
     <string name="progressDialogMessage">Laufender Prozess wird beendet, bitte warten...</string>
-    <string name="editingAlertBuilder">Ersetze IP Adresse durch Hostnamen</string>
+    <string name="editingAlertBuilder">Editieren von Server / Hostname und IP - Adresse</string>
     <string name="ok">Ok</string>
     <string name="use_hostname">Hostname zum Abschalten benutzen</string>
     <string name="use_ip">Ip Adresse zum Abschalten benutzen</string>
