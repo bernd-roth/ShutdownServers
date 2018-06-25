@@ -2,6 +2,7 @@ package at.co.netconsulting.shutdownservers;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,8 +19,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -30,10 +34,14 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import at.co.netconsulting.at.co.netconsulting.general.CustomArrayAdapter;
+import at.co.netconsulting.at.co.netconsulting.general.RowContainer;
 import at.co.netconsulting.at.co.netconsulting.general.Settings;
+import at.co.netconsulting.at.co.netconsulting.general.SettingsCustomArrayAdapter;
 import at.co.netconsulting.database.DatabaseHelper;
 import at.co.netconsulting.sharedpreferences.SharedPreferenceModel;
 import at.co.netconsulting.sharedpreferences.SharedPreferencesStaticVariables;
@@ -62,6 +70,9 @@ public class ShutdownServers extends AppCompatActivity {
     private String filePath;
     private Properties config;
     private JSch jsch;
+    private List<Integer> row;
+    private RowContainer rowContainer;
+    private boolean isNotifyCalling=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +111,80 @@ public class ShutdownServers extends AppCompatActivity {
                 }
             }
         });
+
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                // ROW BACKGROUND COLOR GREEN
+                custom.notifyDataSetChanged(position, isNotifyCalling);
+                row.add(position);
+                rowContainer.addRow(position);
+
+                createDialog(view, position);
+                return true;
+            }
+        });
+    }
+
+    private void createDialog(final View view, final int position) {
+        final String ip = String.valueOf(array_list.get(position));
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+        alert.setTitle(getResources().getString(R.string.editingAlertBuilder));
+
+        // Set an EditText view to get user input
+        final EditText editTextHostname = new EditText(this);
+        editTextHostname.setHint("Host / Servername");
+        final EditText editTextIpAddress = new EditText(this);
+        editTextIpAddress.setHint("192.168.1.1");
+
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(editTextHostname);
+        layout.addView(editTextIpAddress);
+
+        alert.setView(layout);
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String hostname = editTextHostname.getText().toString();
+                String ip = editTextIpAddress.getText().toString();
+
+                String[] hostnameAndip = array_list.get(position).split("\n");
+                deleteOneEntryProvidingIpAndHostname(hostnameAndip[0].toString(), hostnameAndip[1].toString());
+
+                array_list.set(position, hostname + "\n" + ip);
+                custom.notifyDataSetChanged(position, true);
+
+                row = rowContainer.getRow();
+
+                for(int i : row)
+                {
+                    String[] hostnameAndIp = array_list.get(i).toString().split("\n");
+                    String hostname1 = hostnameAndIp[0];
+                    String ip1 = hostnameAndIp[1];
+
+                    saveListToDatabase(hostname1, ip1);
+                }
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
+
+        alert.show();
+    }
+
+    private void deleteOneEntryProvidingIpAndHostname(String hostname, String ip) {
+        mydb.deleteHostnameAndIp(hostname, ip);
+    }
+
+    private void saveListToDatabase(String hostname, String ip)
+    {
+        mydb.insertContactWithHostnameAndIp(hostname, ip);
     }
 
     private class HostWorker extends AsyncTask<Integer, String, Void> {
@@ -174,7 +259,11 @@ public class ShutdownServers extends AppCompatActivity {
         btnStartShutdown.setText(R.string.startshutdown);
         btnStartShutdown.setBackgroundColor(Color.GREEN);
 
+        row = new ArrayList<Integer>();
+        rowContainer = new RowContainer();
+
         lv = (ListView) findViewById(R.id.listView);
+        lv.setLongClickable(true);
         // DataBind ListView with items from ArrayAdapter
         custom = new CustomArrayAdapter(this, android.R.layout.simple_list_item_1, array_list);
         lv.setAdapter(custom);
@@ -194,7 +283,6 @@ public class ShutdownServers extends AppCompatActivity {
     }
 
     public void executeRemoteCommand(Context context, String hostname, String ip) throws Exception {
-        boolean isConnected = true;
         String command = "sudo shutdown -h now";
         model = new SharedPreferenceModel(this);
         String radioButtonHostnameOrIp = model.getStringSharedPreference(SharedPreferencesStaticVariables.SHUTDOWN_USING_HOSTNAME_OR_IP);
@@ -219,8 +307,11 @@ public class ShutdownServers extends AppCompatActivity {
             }
             else
             {
-                session = jsch.getSession(model.getStringSharedPreference(SharedPreferencesStaticVariables.USERNAME), ip, SharedPreferencesStaticVariables.SSH_PORT);
-                session.setPassword(model.getStringSharedPreference(SharedPreferencesStaticVariables.PASSWORD));
+                String username = model.getStringSharedPreference(SharedPreferencesStaticVariables.USERNAME);
+                String password = model.getStringSharedPreference(SharedPreferencesStaticVariables.PASSWORD);
+
+                session = jsch.getSession(username, ip, SharedPreferencesStaticVariables.SSH_PORT);
+                session.setPassword(password);
             }
             session.setConfig(config);
             session.connect();
@@ -231,8 +322,7 @@ public class ShutdownServers extends AppCompatActivity {
             channel.disconnect();
             session.disconnect();
         } catch (JSchException JSchEx) {
-            MyException except = new MyException("No connection possible. Error message is: " + JSchEx.getMessage());
-            except.alertUser(getApplicationContext());
+            JSchEx.getMessage();
         }
     }
 

@@ -53,6 +53,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
+    public void deleteAll () {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("server_table", null, null);
+    }
+
     public Cursor getData(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "select * from server_table where id="+id+"", null );
@@ -85,9 +90,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.delete(CONTACTS_TABLE_NAME, null, null);
     }
 
-    public Integer deleteHostnameAndIp (String hostname) {
+    public Integer deleteHostnameAndIp (String hostname, String ip) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete(CONTACTS_TABLE_NAME, CONTACTS_COLUMN_HOSTNAME + "=" + "\"" + hostname + "\"", null);
+        return db.delete(CONTACTS_TABLE_NAME, CONTACTS_COLUMN_HOSTNAME + "=" + "\"" + hostname + "\" and " + CONTACTS_COLUMN_NAME + "=" + "\"" + ip + "\"", null);
     }
 
     public ArrayList<String> getAllCotacts() {
@@ -102,5 +107,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             res.moveToNext();
         }
         return array_list;
+    }
+
+    public int getSize() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "select count(*) from server_table", null );
+        return res.getCount();
     }
 }

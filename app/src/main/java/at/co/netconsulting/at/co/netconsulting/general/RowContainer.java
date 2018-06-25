@@ -4,7 +4,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-class RowContainer {
+public class RowContainer {
     private ArrayList<Integer> row = new ArrayList<>();
 
     public RowContainer()
